@@ -89,7 +89,7 @@ export class SeriesTooltip {
 
 export abstract class Series extends Observable {
     protected static readonly highlightedZIndex = 1000000000000;
-    protected static readonly SERIES_LAYER_ZINDEX = 100;
+    static readonly SERIES_LAYER_ZINDEX = 100;
     protected static readonly SERIES_HIGHLIGHT_LAYER_ZINDEX = 150;
 
     readonly id = createId(this);
@@ -200,7 +200,7 @@ export abstract class Series extends Observable {
     abstract update(): void;
 
     protected getOpacity(datum?: { itemId?: any }): number {
-        const { 
+        const {
             chart: { highlightedDatum: { series = undefined, itemId = undefined } = {} } = {},
             highlightStyle: { series: { dimOpacity = 1 } },
          } = this;
@@ -212,7 +212,7 @@ export abstract class Series extends Observable {
              // Highlighting not active.
              return defaultOpacity;
          }
-        
+
         if (series !== this) {
              // Highlighting active, this series not highlighted.
              return dimOpacity;
@@ -227,7 +227,7 @@ export abstract class Series extends Observable {
     }
 
     protected getStrokeWidth(defaultStrokeWidth: number): number {
-        const { 
+        const {
             chart: { highlightedDatum: { series = undefined } = {} } = {},
             highlightStyle: { series: { strokeWidth } },
         } = this;
