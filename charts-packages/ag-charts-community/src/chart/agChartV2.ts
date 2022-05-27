@@ -43,7 +43,7 @@ import { Axis } from '../axis';
 import { GroupedCategoryChart } from './groupedCategoryChart';
 import { prepareOptions, isAgCartesianChartOptions, isAgHierarchyChartOptions, isAgPolarChartOptions, optionsType } from './mapping/prepare';
 import { SeriesOptionsTypes } from './mapping/defaults';
-import { Annotation } from './shapes/Annotation';
+import { Annotation } from './shapes/annotation';
 
 type ChartType = CartesianChart | PolarChart | HierarchyChart;
 

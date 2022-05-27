@@ -2,7 +2,7 @@ import { Series } from "../series";
 import { ChartAxis, ChartAxisDirection } from "../../chartAxis";
 import { SeriesMarker, SeriesMarkerFormatterParams } from "../seriesMarker";
 import { isContinuous, isDiscrete } from "../../../util/value";
-import { Annotation } from "../../shapes/Annotation";
+import { Annotation } from "../../shapes/annotation";
 import { Group } from "../../../scene/group";
 
 class SeriesAnnotations {
