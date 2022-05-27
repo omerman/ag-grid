@@ -4,6 +4,8 @@ import { FontStyle, FontWeight } from "../../scene/shape/text";
 import { ChartAxisDirection } from "../chartAxis";
 import { PointerEvents } from "../../scene/node";
 import { Scale } from "../../scale/scale";
+import { createId } from "../../util/id";
+import { Series } from "../series/series";
 
 export class AnnotationLabel {
     text?: string = undefined;
@@ -36,33 +38,35 @@ interface AnnotationPathData {
 }
 export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, number>> {
 
-    readonly id = "annotation"; // createId
+    protected static readonly ANNOTATION_LAYER_ZINDEX = Series.SERIES_LAYER_ZINDEX - 20;
 
-    type?: "line" | "range";
-    range?: [any, any];
-    value?: any;
-    fill?: string;
-    fillOpacity?: number;
-    stroke?: string;
-    strokeWidth?: number;
-    strokeOpacity?: number;
-    lineDash?: [];
-    style?: AnnotationStyle = new AnnotationStyle();
+    static className = "Annotation";
+    readonly id = createId(this);
+
+    kind?: "line" | "range" = undefined;
+    range?: [any, any] = undefined;
+    value?: any = undefined;
+    fill?: string = undefined;
+    fillOpacity?: number = undefined;
+    stroke?: string = undefined;
+    strokeWidth?: number = undefined;
+    strokeOpacity?: number = undefined;
+    lineDash?: [] = undefined;
     label?: AnnotationLabel = new AnnotationLabel();
 
     xScale?: XS = undefined;
     yScale?: YS = undefined;
     direction?: ChartAxisDirection = undefined;
 
-    readonly annotationGroup = new Group();
+    readonly group = new Group({ name: `${this.id}`, layer: true, zIndex: Annotation.ANNOTATION_LAYER_ZINDEX });
     private annotationLine: Path = new Path();
     private annotationRange: Path = new Path();
     private pathData?: AnnotationPathData = undefined;
 
     constructor() {
-        const { annotationGroup, annotationLine, annotationRange } = this;
+        const { group, annotationLine, annotationRange } = this;
 
-        annotationGroup.append([annotationRange, annotationLine]);
+        group.append([annotationRange, annotationLine]);
 
         annotationLine.fill = undefined;
         annotationLine.lineJoin = 'round';
@@ -73,6 +77,7 @@ export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, num
     }
 
     update() {
+        if (!this.kind) { return; }
         this.createNodeData();
         this.updatePaths();
     }
@@ -81,7 +86,7 @@ export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, num
         this.updateLinePath();
         this.updateLineNode();
 
-        if (this.type === 'range') {
+        if (this.kind === 'range') {
             this.updateRangePath();
             this.updateRangeNode();
         }
@@ -92,23 +97,24 @@ export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, num
 
         if (!xScale || !yScale) { return; }
 
-        const xBandWidth = xScale.bandwidth || 0;
-        const yBandWidth = yScale.bandwidth || 0;
+        const halfXBandWidth = (xScale.bandwidth || 0) / 2;
+        const halfYBandWidth = (yScale.bandwidth || 0) / 2;
 
         let xStart, xEnd, yStart, yEnd;
 
         if (direction === ChartAxisDirection.X) {
             [xStart, xEnd] = range || [value, 0];
-            [xStart, xEnd] = [xScale.convert(xStart) + xBandWidth, xScale.convert(xEnd) + xBandWidth];
+            [xStart, xEnd] = [xScale.convert(xStart) + halfXBandWidth, xScale.convert(xEnd) + halfXBandWidth];
             [yStart, yEnd] = yScale.range;
         } else {
             [xStart, xEnd] = xScale.range;
             [yStart, yEnd] = range || [value, 0];
-            [yStart, yEnd] = [yScale.convert(yStart) + yBandWidth, yScale.convert(yEnd) + yBandWidth];
+            [yStart, yEnd] = [yScale.convert(yStart) + halfYBandWidth, yScale.convert(yEnd) + halfYBandWidth];
         }
 
-        const pathData = this.pathData || (this.pathData = { points: []});
-        pathData.points.push(
+        this.pathData = { points: [] };
+
+        this.pathData.points.push(
             {
                 x: xStart,
                 y: yStart
@@ -130,12 +136,12 @@ export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, num
 
     private updateLinePath() {
         const { annotationLine, pathData = { points: [] } } = this;
-        const pathMethods = ['moveTo', 'lineTo', 'moveTo', 'lineTo'];
+        const pathMethods: ('moveTo' | 'lineTo')[] = ['moveTo', 'lineTo', 'moveTo', 'lineTo'];
         const points = pathData.points;
         const { path } = annotationLine;
 
         path.clear();
-        pathMethods.forEach((method: 'moveTo' | 'lineTo', i) => {
+        pathMethods.forEach((method, i) => {
             const { x, y } = points[i];
             path[method](x, y);
         })
