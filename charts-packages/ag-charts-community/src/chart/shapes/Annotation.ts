@@ -69,10 +69,8 @@ export class Annotation {
         group.append([annotationRange, annotationLine]);
 
         annotationLine.fill = undefined;
-        annotationLine.lineJoin = 'round';
         annotationLine.pointerEvents = PointerEvents.None;
 
-        annotationRange.lineJoin = 'round';
         annotationRange.pointerEvents = PointerEvents.None;
     }
 
@@ -103,12 +101,12 @@ export class Annotation {
         let xStart, xEnd, yStart, yEnd;
 
         if (direction === ChartAxisDirection.X) {
-            [xStart, xEnd] = range || [value, 0];
+            [xStart, xEnd] = range || [value, undefined];
             [xStart, xEnd] = [xScale.convert(xStart) + halfXBandWidth, xScale.convert(xEnd) + halfXBandWidth];
             [yStart, yEnd] = yScale.range;
         } else {
             [xStart, xEnd] = xScale.range;
-            [yStart, yEnd] = range || [value, 0];
+            [yStart, yEnd] = range || [value, undefined];
             [yStart, yEnd] = [yScale.convert(yStart) + halfYBandWidth, yScale.convert(yEnd) + halfYBandWidth];
         }
 
