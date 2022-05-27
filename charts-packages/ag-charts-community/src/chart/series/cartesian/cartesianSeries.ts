@@ -52,9 +52,8 @@ export abstract class CartesianSeries extends Series {
         [ChartAxisDirection.Y]: ['yKey']
     };
 
-    protected annotations?: SeriesAnnotations = new SeriesAnnotations(this);
-
-    private annotationGroup: Group = new Group();
+    private annotations?: SeriesAnnotations = new SeriesAnnotations(this);
+    readonly annotationGroup: Group = new Group({ name: `${this.id}-Annotations`});
 
     constructor() {
         super();
