@@ -265,6 +265,7 @@ export class ScatterSeries extends CartesianSeries {
     }
 
     update(): void {
+        super.update();
         this.updateSelections();
         this.updateNodes();
     }

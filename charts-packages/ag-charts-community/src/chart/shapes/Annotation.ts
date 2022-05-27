@@ -36,7 +36,7 @@ interface AnnotationPathData {
         readonly y: number;
     }[];
 }
-export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, number>> {
+export class Annotation {
 
     protected static readonly ANNOTATION_LAYER_ZINDEX = Series.SERIES_LAYER_ZINDEX - 20;
 
@@ -54,8 +54,8 @@ export class Annotation<XS extends Scale<any, number>, YS extends Scale<any, num
     lineDash?: [] = undefined;
     label?: AnnotationLabel = new AnnotationLabel();
 
-    xScale?: XS = undefined;
-    yScale?: YS = undefined;
+    xScale?: Scale<any, number> = undefined;
+    yScale?: Scale<any, number> = undefined;
     direction?: ChartAxisDirection = undefined;
 
     readonly group = new Group({ name: `${this.id}`, layer: true, zIndex: Annotation.ANNOTATION_LAYER_ZINDEX });

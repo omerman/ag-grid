@@ -43,6 +43,7 @@ import { Axis } from '../axis';
 import { GroupedCategoryChart } from './groupedCategoryChart';
 import { prepareOptions, isAgCartesianChartOptions, isAgHierarchyChartOptions, isAgPolarChartOptions, optionsType } from './mapping/prepare';
 import { SeriesOptionsTypes } from './mapping/defaults';
+import { Annotation } from './shapes/Annotation';
 
 type ChartType = CartesianChart | PolarChart | HierarchyChart;
 
@@ -375,6 +376,8 @@ const JSON_APPLY_OPTIONS: Parameters<typeof jsonApply>[2] = {
         'title': Caption,
         'subtitle': Caption,
         'shadow': DropShadow,
+        'series[].annotations.xAxis[]': Annotation,
+        'series[].annotations.yAxis[]': Annotation,
     },
     allowedTypes: {
         'series[].marker.shape': ['primitive', 'function'],

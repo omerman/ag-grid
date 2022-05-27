@@ -191,6 +191,7 @@ export class LineSeries extends CartesianSeries {
     }
 
     update(): void {
+        super.update();
         this.updateSelections();
         this.updateNodes();
     }
@@ -412,9 +413,9 @@ export class LineSeries extends CartesianSeries {
     private updateTextNodes() {
         const updateTextFn = (text: Text, datum: LineNodeDatum) => {
             const { point, label } = datum;
-    
+
             const { enabled: labelEnabled, fontStyle, fontWeight, fontSize, fontFamily, color } = this.label;
-    
+
             if (label && labelEnabled) {
                 text.fontStyle = fontStyle;
                 text.fontWeight = fontWeight;
