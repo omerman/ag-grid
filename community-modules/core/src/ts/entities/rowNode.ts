@@ -142,10 +142,6 @@ export class RowNode implements IEventEmitter {
     /** If row is pinned, then pinnedRowTop is used rather than rowTop */
     public stickyRowTop: number;
 
-    public initialStickyRowTop: number;
-
-    public stickySliding: boolean;
-
     /** If using quick filter, stores a string representation of the row for searching against. */
     public quickFilterAggregateText: string | null;
 
@@ -653,6 +649,9 @@ export class RowNode implements IEventEmitter {
         }
     }
 
+    /**
+     * Set the expanded state of this rowNode. Pass `true` to expand and `false` to collapse.
+     */
     public setExpanded(expanded: boolean, e?: MouseEvent | KeyboardEvent): void {
         if (this.expanded === expanded) { return; }
 

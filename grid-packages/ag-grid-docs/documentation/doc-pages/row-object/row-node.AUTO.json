@@ -111,8 +111,6 @@
     "description": "/** If row is pinned, then pinnedRowTop is used rather than rowTop */",
     "type": { "returnType": "number" }
   },
-  "initialStickyRowTop": { "type": { "returnType": "number" } },
-  "stickySliding": { "type": { "returnType": "boolean" } },
   "quickFilterAggregateText": {
     "description": "/** If using quick filter, stores a string representation of the row for searching against. */",
     "type": { "returnType": "string | null" }
@@ -313,6 +311,7 @@
     "type": { "arguments": { "uiLevel": "number" }, "returnType": "void" }
   },
   "setExpanded": {
+    "description": "/** Set the expanded state of this rowNode. Pass `true` to expand and `false` to collapse. */",
     "type": {
       "arguments": {
         "expanded": "boolean",

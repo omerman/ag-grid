@@ -36,8 +36,9 @@ export interface IGridBodyComp extends LayoutView {
     setTopDisplay(display: string): void;
     setBottomHeight(height: number): void;
     setBottomDisplay(display: string): void;
-    setStickyTopHeight(height: number): void;
-    setStickyTopOffsetTop(offsetTop: number): void;
+    setStickyTopHeight(height: string): void;
+    setStickyTopTop(offsetTop: string): void;
+    setStickyTopWidth(width: string): void;
     setColumnCount(count: number): void;
     setRowCount(count: number): void;
     setRowAnimationCssOnBodyViewport(cssClass: string, animate: boolean): void;
@@ -67,6 +68,7 @@ export class GridBodyCtrl extends BeanStub {
     private eTop: HTMLElement;
     private eBottom: HTMLElement;
     private eStickyTop: HTMLElement;
+    private stickyTopHeight: number = 0;
 
     private bodyScrollFeature: GridBodyScrollFeature;
     private rowDragFeature: RowDragFeature;
@@ -121,7 +123,6 @@ export class GridBodyCtrl extends BeanStub {
         this.addManagedListener(this.eventService, Events.EVENT_GRID_COLUMNS_CHANGED, this.onGridColumnsChanged.bind(this));
         this.addManagedListener(this.eventService, Events.EVENT_SCROLL_VISIBILITY_CHANGED, this.onScrollVisibilityChanged.bind(this));
         this.addManagedListener(this.eventService, Events.EVENT_PINNED_ROW_DATA_CHANGED, this.onPinnedRowDataChanged.bind(this));
-        this.addManagedListener(this.eventService, Events.EVENT_DISPLAYED_ROWS_CHANGED, this.onDisplayedRowsChanged.bind(this));
         this.addManagedListener(this.eventService, Events.EVENT_HEADER_HEIGHT_CHANGED, this.onHeaderHeightChanged.bind(this));
     }
 
@@ -152,6 +153,7 @@ export class GridBodyCtrl extends BeanStub {
     private onScrollVisibilityChanged(): void {
         const visible = this.scrollVisibleService.isVerticalScrollShowing();
         this.setVerticalScrollPaddingVisible(visible);
+        this.setStickyTopWidth(visible);
     }
 
     private onGridColumnsChanged(): void {
@@ -334,14 +336,23 @@ export class GridBodyCtrl extends BeanStub {
         this.comp.setBottomDisplay(floatingBottomHeight ? 'inherit' : 'none');
     }
 
-    private onDisplayedRowsChanged(): void {
-        this.setStickyTopHeight();
+    public setStickyTopHeight(height: number = 0): void {
+        // console.log('setting sticky top height ' + height);
+        this.comp.setStickyTopHeight(`${height}px`);
+        this.stickyTopHeight = height;
     }
 
-    private setStickyTopHeight(): void {
-        const height = this.rowRenderer.getStickyTopHeight();
+    public getStickyTopHeight(): number {
+        return this.stickyTopHeight;
+    }
 
-        this.comp.setStickyTopHeight(height);
+    private setStickyTopWidth(vScrollVisible: boolean) {
+        if (!vScrollVisible) {
+            this.comp.setStickyTopWidth('100%');
+        } else {
+            const scrollbarWidth = this.gridOptionsWrapper.getScrollbarWidth();
+            this.comp.setStickyTopWidth(`calc(100% - ${scrollbarWidth}px)`);
+        }
     }
 
     private onHeaderHeightChanged(): void {
@@ -352,7 +363,7 @@ export class GridBodyCtrl extends BeanStub {
         const headerCtrl = this.ctrlsService.getGridHeaderCtrl();
         const height = headerCtrl.getHeaderHeight();
 
-        this.comp.setStickyTopOffsetTop(height + 1);
+        this.comp.setStickyTopTop(`${height + 1}px`);
     }
 
     // method will call itself if no available width. this covers if the grid
