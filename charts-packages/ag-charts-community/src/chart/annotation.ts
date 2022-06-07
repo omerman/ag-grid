@@ -1,11 +1,11 @@
-import { Path } from "../../scene/shape/path";
-import { Group } from "../../scene/group";
-import { FontStyle, FontWeight } from "../../scene/shape/text";
-import { ChartAxisDirection } from "../chartAxis";
-import { PointerEvents } from "../../scene/node";
-import { Scale } from "../../scale/scale";
-import { createId } from "../../util/id";
-import { Series } from "../series/series";
+import { Path } from "../scene/shape/path";
+import { Group } from "../scene/group";
+import { FontStyle, FontWeight } from "../scene/shape/text";
+import { ChartAxisDirection } from "./chartAxis";
+import { PointerEvents } from "../scene/node";
+import { Scale } from "../scale/scale";
+import { createId } from "../util/id";
+import { Series } from "./series/series";
 
 export class AnnotationLabel {
     text?: string = undefined;
