@@ -75,15 +75,16 @@ export abstract class CartesianSeries extends Series {
     updateAnnotations() {
         const xScale = this.xAxis?.scale;
         const yScale = this.yAxis?.scale;
+        const visible = this.group.visible;
         this.annotations?.xAxis?.forEach((xAnnotation) => {
             xAnnotation.xScale = xScale;
             xAnnotation.yScale = yScale;
-            xAnnotation.update();
+            xAnnotation.update(visible);
         });
         this.annotations?.yAxis?.forEach((yAnnotation) => {
             yAnnotation.xScale = xScale;
             yAnnotation.yScale = yScale;
-            yAnnotation.update();
+            yAnnotation.update(visible);
         });
     }
 

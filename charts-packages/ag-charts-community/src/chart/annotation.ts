@@ -74,8 +74,13 @@ export class Annotation {
         annotationRange.pointerEvents = PointerEvents.None;
     }
 
-    update() {
+    update(visible: boolean) {
         if (!this.kind) { return; }
+
+        this.group.visible = visible;
+
+        if (!visible) { return; }
+
         this.createNodeData();
         this.updatePaths();
     }
