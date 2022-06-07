@@ -38,7 +38,7 @@ interface AnnotationPathData {
 }
 export class Annotation {
 
-    protected static readonly ANNOTATION_LAYER_ZINDEX = Series.SERIES_LAYER_ZINDEX - 20;
+    protected static readonly ANNOTATION_LAYER_ZINDEX = Series.SERIES_LAYER_ZINDEX + 20;
 
     static className = "Annotation";
     readonly id = createId(this);

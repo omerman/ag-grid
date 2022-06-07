@@ -15,7 +15,6 @@ class SeriesAnnotations {
 
     private _xAxis?: Annotation[] = [];
     set xAxis(value: Annotation[] | undefined) {
-        console.log("value: xAxis", value)
         this._xAxis?.forEach(xAnnotation => this.series.detachAnnotation(xAnnotation));
 
         this._xAxis = value;
@@ -31,7 +30,6 @@ class SeriesAnnotations {
 
     private _yAxis?: Annotation[] = [];
     set yAxis(value: Annotation[] | undefined) {
-        console.log("value: yAxis", value)
         this._yAxis?.forEach(yAnnotation => this.series.detachAnnotation(yAnnotation));
 
         this._yAxis = value;
@@ -53,7 +51,7 @@ export abstract class CartesianSeries extends Series {
     };
 
     private annotations?: SeriesAnnotations = new SeriesAnnotations(this);
-    readonly annotationGroup: Group = new Group({ name: `${this.id}-Annotations`});
+    readonly annotationGroup: Group = new Group({ name: `${this.id}-Annotations` });
 
     constructor() {
         super();
