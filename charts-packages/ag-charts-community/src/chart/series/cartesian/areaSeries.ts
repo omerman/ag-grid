@@ -443,9 +443,13 @@ export class AreaSeries extends CartesianSeries {
         this.highlightGroup.visible = visible && this.chart?.highlightedDatum?.series === this;
 
         this.updateMarkerNodes(this.highlightMarkerSelection, true);
-        this.seriesGroups.forEach(({ markerSelection, group }, idx) => {
+        this.seriesGroups.forEach(({ markerSelection, fill, group }, idx) => {
             group.opacity = this.getOpacity(this.fillSelectionData[idx]);
-            group.visible = visible;
+            group.visible = visible && !!this.seriesItemEnabled.get(fill.datum.itemId);
+
+            if (!group.visible) {
+                return;
+            }
 
             this.updateFillNodes(idx);
             this.updateStrokeNodes(idx);
@@ -629,7 +633,9 @@ export class AreaSeries extends CartesianSeries {
                 }
             });
 
-            fillPoints.push(...fillPhantomPoints.slice().reverse());
+            for (let i = fillPhantomPoints.length - 1; i >= 0; i--) {
+                fillPoints.push(fillPhantomPoints[i]);
+            }
         });
 
         this.allMarkerSelectionData = markerSelectionData.reduce((r, n) => r.concat(n), []);
@@ -689,7 +695,7 @@ export class AreaSeries extends CartesianSeries {
 
     private updateFillNodes(idx: number) {
         const { fill, fill: { datum } } = this.seriesGroups[idx];
-        const { fills, fillOpacity, strokeOpacity, strokeWidth, shadow, seriesItemEnabled } = this;
+        const { fills, fillOpacity, strokeOpacity, strokeWidth, shadow } = this;
 
         fill.fill = fills[idx % fills.length];
         fill.fillOpacity = fillOpacity;
@@ -698,12 +704,11 @@ export class AreaSeries extends CartesianSeries {
         fill.lineDash = this.lineDash;
         fill.lineDashOffset = this.lineDashOffset;
         fill.fillShadow = shadow;
-        fill.visible = !!seriesItemEnabled.get(datum.itemId);
 
         const { points } = datum as FillSelectionDatum;
 
         const path = fill.path;
-        path.clear();
+        path.clear({ trackChanges: true });
 
         points.forEach(({ x, y }, i) => {
             if (i > 0) {
@@ -714,6 +719,7 @@ export class AreaSeries extends CartesianSeries {
         });
 
         path.closePath();
+        fill.checkPathDirty();
     }
 
     private updateStrokeSelection(idx: number): void {
@@ -733,11 +739,10 @@ export class AreaSeries extends CartesianSeries {
         }
 
         const { stroke, stroke: { datum } } = this.seriesGroups[idx];
-        const { strokes, strokeOpacity, seriesItemEnabled } = this;
+        const { strokes, strokeOpacity } = this;
 
         let moveTo = true;
 
-        stroke.visible = !!seriesItemEnabled.get(datum.itemId);
         stroke.stroke = strokes[idx % strokes.length];
         stroke.strokeWidth = this.getStrokeWidth(this.strokeWidth);
         stroke.strokeOpacity = strokeOpacity;
@@ -747,7 +752,7 @@ export class AreaSeries extends CartesianSeries {
         const { points, yValues } = datum as StrokeSelectionDatum;
 
         const path = stroke.path
-        path.clear();
+        path.clear({ trackChanges: true });
 
         points.forEach(({x, y}, i) => {
             if (yValues[i] === undefined) {
@@ -759,14 +764,16 @@ export class AreaSeries extends CartesianSeries {
                 path.lineTo(x, y);
             }
         });
+        stroke.checkPathDirty();
     }
 
     private updateMarkerSelection(
         markerSelection: Selection<Marker, Group, MarkerSelectionDatum, any>,
         data: MarkerSelectionDatum[],
     ): Selection<Marker, Group, MarkerSelectionDatum, any> {
-        const MarkerShape = getMarker(this.marker.shape);
-        data = MarkerShape ? data : [];
+        const { marker: { enabled, shape }} = this;
+        data = shape && enabled ? data : [];
+        const MarkerShape = getMarker(shape);
 
         const updateMarkers = markerSelection.setData(data);
         updateMarkers.exit.remove();
@@ -845,7 +852,7 @@ export class AreaSeries extends CartesianSeries {
 
             node.translationX = datum.point.x;
             node.translationY = datum.point.y;
-            node.visible = marker.enabled && node.size > 0 && !!seriesItemEnabled.get(datum.yKey) && !isNaN(datum.point.x) && !isNaN(datum.point.y);
+            node.visible = node.size > 0 && !!seriesItemEnabled.get(datum.yKey) && !isNaN(datum.point.x) && !isNaN(datum.point.y);
         });
     }
 
