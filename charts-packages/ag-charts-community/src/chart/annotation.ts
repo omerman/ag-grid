@@ -104,37 +104,56 @@ export class Annotation {
         const halfYBandWidth = (yScale.bandwidth || 0) / 2;
 
         let xStart, xEnd, yStart, yEnd;
+        this.pathData = { points: [] };
 
         if (direction === ChartAxisDirection.X) {
             [xStart, xEnd] = range || [value, undefined];
             [xStart, xEnd] = [xScale.convert(xStart) + halfXBandWidth, xScale.convert(xEnd) + halfXBandWidth];
             [yStart, yEnd] = yScale.range;
+
+            this.pathData.points.push(
+                {
+                    x: xStart,
+                    y: yStart
+                },
+                {
+                    x: xStart,
+                    y: yEnd
+                },
+                {
+                    x: xEnd,
+                    y: yEnd
+                },
+                {
+                    x: xEnd,
+                    y: yStart
+                }
+            );
+
         } else {
             [xStart, xEnd] = xScale.range;
             [yStart, yEnd] = range || [value, undefined];
             [yStart, yEnd] = [yScale.convert(yStart) + halfYBandWidth, yScale.convert(yEnd) + halfYBandWidth];
+
+            this.pathData.points.push(
+                {
+                    x: xStart,
+                    y: yStart
+                },
+                {
+                    x: xEnd,
+                    y: yStart
+                },
+                {
+                    x: xEnd,
+                    y: yEnd
+                },
+                {
+                    x: xStart,
+                    y: yEnd
+                }
+            );
         }
-
-        this.pathData = { points: [] };
-
-        this.pathData.points.push(
-            {
-                x: xStart,
-                y: yStart
-            },
-            {
-                x: xStart,
-                y: yEnd
-            },
-            {
-                x: xEnd,
-                y: yEnd
-            },
-            {
-                x: xEnd,
-                y: yStart
-            }
-        );
     }
 
     private updateLinePath() {
