@@ -1,11 +1,12 @@
-import { Grid, GridOptions, IServerSideDatasource } from '@ag-grid-community/core'
+import { Grid, GridOptions, IServerSideDatasource, IServerSideGetRowsRequest } from '@ag-grid-community/core'
 
 const gridOptions: GridOptions = {
   columnDefs: [
-    { field: 'athlete', minWidth: 220 },
-    { field: 'country', minWidth: 200 },
+    { valueGetter: 'node.rowIndex', minWidth: 60},
+    { field: 'athlete', minWidth: 150 },
+    { field: 'country', minWidth: 150 },
     { field: 'year' },
-    { field: 'sport', minWidth: 200 },
+    { field: 'sport', minWidth: 120 },
     { field: 'gold' },
     { field: 'silver' },
     { field: 'bronze' },
@@ -13,12 +14,11 @@ const gridOptions: GridOptions = {
 
   defaultColDef: {
     flex: 1,
-    minWidth: 100,
-    sortable: true,
+    minWidth: 80,
   },
 
   rowModelType: 'serverSide',
-  serverSideStoreType: 'full',
+  serverSideInfiniteScroll: true
 }
 
 // setup the grid after the page has finished loading
@@ -51,13 +51,13 @@ function createServerSideDatasource(server: any): IServerSideDatasource {
       )
 
       // get data for request from our fake server
-      var response = server.getData()
+      var response = server.getData(params.request)
 
       // simulating real server call with a 500ms delay
       setTimeout(function () {
         if (response.success) {
           // supply rows for requested block to grid
-          params.success({ rowData: response.rows })
+          params.success({ rowData: response.rows, rowCount: response.lastRow })
         } else {
           params.fail()
         }
@@ -68,11 +68,26 @@ function createServerSideDatasource(server: any): IServerSideDatasource {
 
 function createFakeServer(allData: any[]) {
   return {
-    getData: () => {
+    getData: (request: IServerSideGetRowsRequest) => {
+      // in this simplified fake server all rows are contained in an array
+      var requestedRows = allData.slice(request.startRow, request.endRow)
+
+      // here we are pretending we don't know the last row until we reach it!
+      var lastRow = getLastRowIndex(request, requestedRows)
+
       return {
         success: true,
-        rows: allData,
+        rows: requestedRows,
+        lastRow: lastRow,
       }
     },
   }
+}
+
+function getLastRowIndex(request: IServerSideGetRowsRequest, results: any[]) {
+  if (!results) return undefined
+  var currentLastRow = (request.startRow || 0) + results.length
+
+  // if on or after the last block, work out the last row, otherwise return 'undefined'
+  return currentLastRow < (request.endRow || 0) ? currentLastRow : undefined
 }

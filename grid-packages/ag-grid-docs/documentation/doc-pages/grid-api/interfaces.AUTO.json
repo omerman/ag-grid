@@ -1642,6 +1642,7 @@
       "cacheOverflowSize?": "number",
       "infiniteInitialRowCount?": "number",
       "serverSideStoreType?": "ServerSideStoreType",
+      "serverSideInfiniteScroll?": "boolean",
       "cacheBlockSize?": "number",
       "maxBlocksInCache?": "number",
       "maxConcurrentDatasourceRequests?": "number",
@@ -2022,7 +2023,8 @@
       "datasource?": "/** Provide the datasource for infinite scrolling. */",
       "cacheOverflowSize?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
       "infiniteInitialRowCount?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
-      "serverSideStoreType?": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "serverSideStoreType?": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
+      "serverSideInfiniteScroll?": "/** Whether Server-side Row Model will use Infinite Scrolling */",
       "cacheBlockSize?": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
       "maxBlocksInCache?": "/** How many blocks to keep in the store. Default is no limit, so every requested block is kept. Use this if you have memory concerns, and blocks that were least recently viewed will be purged when the limit is hit. The grid will additionally make sure it has all the blocks needed to display what is currently visible, in case this property is set to a low value. */",
       "maxConcurrentDatasourceRequests?": "/** How many requests to hit the server with concurrently. If the max is reached, requests are queued.\n * Set to `-1` for no maximum restriction on requests.\n * Default: `2` */",
@@ -2032,7 +2034,7 @@
       "serverSideSortAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was sorted. This property only applies when there is Row Grouping & sorting is handled on the server. Default: `false` */",
       "serverSideFilterAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was filtered. This property only applies when there is Row Grouping & filtering is handled on the server. Default: `false` */",
       "serverSideSortOnServer?": "/** When enabled, the grid will always request the server to provide the sort results */",
-      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server to provide the filter results */",
       "serverSideSortingAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideSortAllLevels` instead.\n */",
       "serverSideFilteringAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideFilterAllLevels` instead.\n */",
       "suppressEnterpriseResetOnNewColumns?": "/** @deprecated */",
@@ -2399,13 +2401,15 @@
     "meta": {},
     "type": {
       "storeType?": "ServerSideStoreType",
+      "infiniteScroll?": "boolean",
       "maxBlocksInCache?": "number",
       "cacheBlockSize?": "number"
     },
     "docs": {
-      "storeType?": "/** What store type to use.\n * If missing, then defaults to grid option `serverSideStoreType`. */",
-      "maxBlocksInCache?": "/** For Partial Store only.\n * How many blocks to keep in cache.\n * If missing, defaults to grid options `maxBlocksInCache`. */",
-      "cacheBlockSize?": "/** For Partial Store only.\n * Cache block size.\n * If missing, defaults to grid options `cacheBlockSize`. */"
+      "storeType?": "/** @deprecated What store type to use.\nIf missing, then defaults to grid option `serverSideStoreType`.\nDeprecated in favor of infiniteScroll.\nIf infiniteScroll==true, then Partial Store is used.\nIf infiniteScroll==false, then Full Store is used.\n */",
+      "infiniteScroll?": "/** Whether to have infinite scroll active or not for the level. */",
+      "maxBlocksInCache?": "/** For Infinite Scroll only.\n * How many blocks to keep in cache.\n * If missing, defaults to grid options `maxBlocksInCache`. */",
+      "cacheBlockSize?": "/** For Infinite Scroll only.\n * Cache block size.\n * If missing, defaults to grid options `cacheBlockSize`. */"
     }
   },
   "LoadingCellRendererSelectorFunc": {
@@ -9421,7 +9425,7 @@
   "ServerSideStoreState": {
     "meta": {},
     "type": {
-      "type": "ServerSideStoreType",
+      "infiniteScroll": "boolean",
       "route": "string[]",
       "rowCount": "number",
       "lastRowIndexKnown?": "boolean",
@@ -9430,13 +9434,13 @@
       "cacheBlockSize?": "number"
     },
     "docs": {
-      "type": "/** Store type, `partial` or `full` */",
+      "infiniteScroll": "/** True if infininte scrolling */",
       "route": "/** The route that identifies this store. */",
       "rowCount": "/** How many rows the store has. This includes 'loading rows'. */",
-      "lastRowIndexKnown?": "/** Partial store only.\n * Whether the last row index is know. */",
+      "lastRowIndexKnown?": "/** Infinite Scroll only.\n * Whether the last row index is know. */",
       "info?": "/** Any extra info provided to the store, when data was loaded. */",
-      "maxBlocksInCache?": "/** Partial store only.\n * Max blocks allowed in the store. */",
-      "cacheBlockSize?": "/** Partial store only.\n * The size (number of rows) of each block. */"
+      "maxBlocksInCache?": "/** Infinite Scroll only.\n *  Max blocks allowed in the store. */",
+      "cacheBlockSize?": "/** Infinite Scroll only.\n * The size (number of rows) of each block. */"
     }
   },
   "SetFilterModelValue": {
@@ -11267,7 +11271,7 @@
     "type": { "rowData": "any[]", "rowCount?": "number", "storeInfo?": "any" },
     "docs": {
       "rowData": "/** Data retrieved from the server as requested by the grid. */",
-      "rowCount?": "/** The last row, if known, to help Infinite Scroll (i.e Partial Store) and Pagination. */",
+      "rowCount?": "/** The last row, if known, to help Infinite Scroll. */",
       "storeInfo?": "/** Any extra information for the grid to associate with this load. */"
     }
   },
@@ -12507,6 +12511,7 @@
       "cacheOverflowSize?": "number",
       "infiniteInitialRowCount?": "number",
       "serverSideStoreType?": "ServerSideStoreType",
+      "serverSideInfiniteScroll?": "boolean",
       "cacheBlockSize?": "number",
       "maxBlocksInCache?": "number",
       "maxConcurrentDatasourceRequests?": "number",
@@ -12887,7 +12892,8 @@
       "datasource?": "/** Provide the datasource for infinite scrolling. */",
       "cacheOverflowSize?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
       "infiniteInitialRowCount?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
-      "serverSideStoreType?": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "serverSideStoreType?": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
+      "serverSideInfiniteScroll?": "/** Whether Server-side Row Model will use Infinite Scrolling */",
       "cacheBlockSize?": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
       "maxBlocksInCache?": "/** How many blocks to keep in the store. Default is no limit, so every requested block is kept. Use this if you have memory concerns, and blocks that were least recently viewed will be purged when the limit is hit. The grid will additionally make sure it has all the blocks needed to display what is currently visible, in case this property is set to a low value. */",
       "maxConcurrentDatasourceRequests?": "/** How many requests to hit the server with concurrently. If the max is reached, requests are queued.\n * Set to `-1` for no maximum restriction on requests.\n * Default: `2` */",
@@ -12897,7 +12903,7 @@
       "serverSideSortAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was sorted. This property only applies when there is Row Grouping & sorting is handled on the server. Default: `false` */",
       "serverSideFilterAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was filtered. This property only applies when there is Row Grouping & filtering is handled on the server. Default: `false` */",
       "serverSideSortOnServer?": "/** When enabled, the grid will always request the server to provide the sort results */",
-      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server to provide the filter results */",
       "serverSideSortingAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideSortAllLevels` instead.\n */",
       "serverSideFilteringAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideFilterAllLevels` instead.\n */",
       "suppressEnterpriseResetOnNewColumns?": "/** @deprecated */",
@@ -13270,6 +13276,7 @@
       "cacheOverflowSize?": "number",
       "infiniteInitialRowCount?": "number",
       "serverSideStoreType?": "ServerSideStoreType",
+      "serverSideInfiniteScroll?": "boolean",
       "cacheBlockSize?": "number",
       "maxBlocksInCache?": "number",
       "maxConcurrentDatasourceRequests?": "number",
@@ -13650,7 +13657,8 @@
       "datasource?": "/** Provide the datasource for infinite scrolling. */",
       "cacheOverflowSize?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
       "infiniteInitialRowCount?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
-      "serverSideStoreType?": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "serverSideStoreType?": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
+      "serverSideInfiniteScroll?": "/** Whether Server-side Row Model will use Infinite Scrolling */",
       "cacheBlockSize?": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
       "maxBlocksInCache?": "/** How many blocks to keep in the store. Default is no limit, so every requested block is kept. Use this if you have memory concerns, and blocks that were least recently viewed will be purged when the limit is hit. The grid will additionally make sure it has all the blocks needed to display what is currently visible, in case this property is set to a low value. */",
       "maxConcurrentDatasourceRequests?": "/** How many requests to hit the server with concurrently. If the max is reached, requests are queued.\n * Set to `-1` for no maximum restriction on requests.\n * Default: `2` */",
@@ -13660,7 +13668,7 @@
       "serverSideSortAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was sorted. This property only applies when there is Row Grouping & sorting is handled on the server. Default: `false` */",
       "serverSideFilterAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was filtered. This property only applies when there is Row Grouping & filtering is handled on the server. Default: `false` */",
       "serverSideSortOnServer?": "/** When enabled, the grid will always request the server to provide the sort results */",
-      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server to provide the filter results */",
       "serverSideSortingAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideSortAllLevels` instead.\n */",
       "serverSideFilteringAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideFilterAllLevels` instead.\n */",
       "suppressEnterpriseResetOnNewColumns?": "/** @deprecated */",
@@ -14037,6 +14045,7 @@
       "cacheOverflowSize?": "number",
       "infiniteInitialRowCount?": "number",
       "serverSideStoreType?": "ServerSideStoreType",
+      "serverSideInfiniteScroll?": "boolean",
       "cacheBlockSize?": "number",
       "maxBlocksInCache?": "number",
       "maxConcurrentDatasourceRequests?": "number",
@@ -14417,7 +14426,8 @@
       "datasource?": "/** Provide the datasource for infinite scrolling. */",
       "cacheOverflowSize?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
       "infiniteInitialRowCount?": "/** How many extra blank rows to display to the user at the end of the dataset, which sets the vertical scroll and then allows the grid to request viewing more rows of data.\n * Default: `1` */",
-      "serverSideStoreType?": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "serverSideStoreType?": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
+      "serverSideInfiniteScroll?": "/** Whether Server-side Row Model will use Infinite Scrolling */",
       "cacheBlockSize?": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
       "maxBlocksInCache?": "/** How many blocks to keep in the store. Default is no limit, so every requested block is kept. Use this if you have memory concerns, and blocks that were least recently viewed will be purged when the limit is hit. The grid will additionally make sure it has all the blocks needed to display what is currently visible, in case this property is set to a low value. */",
       "maxConcurrentDatasourceRequests?": "/** How many requests to hit the server with concurrently. If the max is reached, requests are queued.\n * Set to `-1` for no maximum restriction on requests.\n * Default: `2` */",
@@ -14427,7 +14437,7 @@
       "serverSideSortAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was sorted. This property only applies when there is Row Grouping & sorting is handled on the server. Default: `false` */",
       "serverSideFilterAllLevels?": "/** When enabled, always refreshes top level groups regardless of which column was filtered. This property only applies when there is Row Grouping & filtering is handled on the server. Default: `false` */",
       "serverSideSortOnServer?": "/** When enabled, the grid will always request the server to provide the sort results */",
-      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "serverSideFilterOnServer?": "/** When enabled, the grid will always request the server to provide the filter results */",
       "serverSideSortingAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideSortAllLevels` instead.\n */",
       "serverSideFilteringAlwaysResets?": "/** @deprecated This property has been deprecated. Use `serverSideFilterAllLevels` instead.\n */",
       "suppressEnterpriseResetOnNewColumns?": "/** @deprecated */",

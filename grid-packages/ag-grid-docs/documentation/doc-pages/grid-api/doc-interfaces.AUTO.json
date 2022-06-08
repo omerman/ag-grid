@@ -3004,8 +3004,12 @@
       "type": { "returnType": "number", "optional": true }
     },
     "serverSideStoreType": {
-      "description": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "description": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
       "type": { "returnType": "ServerSideStoreType", "optional": true }
+    },
+    "serverSideInfiniteScroll": {
+      "description": "/** Whether Server-side Row Model will use Infinite Scrolling */",
+      "type": { "returnType": "boolean", "optional": true }
     },
     "cacheBlockSize": {
       "description": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
@@ -3044,7 +3048,7 @@
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideFilterOnServer": {
-      "description": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "description": "/** When enabled, the grid will always request the server to provide the filter results */",
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideSortingAlwaysResets": {
@@ -5100,15 +5104,19 @@
   "ServerSideStoreType": {},
   "ServerSideStoreParams": {
     "storeType": {
-      "description": "/** What store type to use.\n * If missing, then defaults to grid option `serverSideStoreType`. */",
+      "description": "/** @deprecated What store type to use.\nIf missing, then defaults to grid option `serverSideStoreType`.\nDeprecated in favor of infiniteScroll.\nIf infiniteScroll==true, then Partial Store is used.\nIf infiniteScroll==false, then Full Store is used.\n */",
       "type": { "returnType": "ServerSideStoreType", "optional": true }
     },
+    "infiniteScroll": {
+      "description": "/** Whether to have infinite scroll active or not for the level. */",
+      "type": { "returnType": "boolean", "optional": true }
+    },
     "maxBlocksInCache": {
-      "description": "/** For Partial Store only.\n * How many blocks to keep in cache.\n * If missing, defaults to grid options `maxBlocksInCache`. */",
+      "description": "/** For Infinite Scroll only.\n * How many blocks to keep in cache.\n * If missing, defaults to grid options `maxBlocksInCache`. */",
       "type": { "returnType": "number", "optional": true }
     },
     "cacheBlockSize": {
-      "description": "/** For Partial Store only.\n * Cache block size.\n * If missing, defaults to grid options `cacheBlockSize`. */",
+      "description": "/** For Infinite Scroll only.\n * Cache block size.\n * If missing, defaults to grid options `cacheBlockSize`. */",
       "type": { "returnType": "number", "optional": true }
     }
   },
@@ -16598,9 +16606,9 @@
     }
   },
   "ServerSideStoreState": {
-    "type": {
-      "description": "/** Store type, `partial` or `full` */",
-      "type": { "returnType": "ServerSideStoreType", "optional": false }
+    "infiniteScroll": {
+      "description": "/** True if infininte scrolling */",
+      "type": { "returnType": "boolean", "optional": false }
     },
     "route": {
       "description": "/** The route that identifies this store. */",
@@ -16611,7 +16619,7 @@
       "type": { "returnType": "number", "optional": false }
     },
     "lastRowIndexKnown": {
-      "description": "/** Partial store only.\n * Whether the last row index is know. */",
+      "description": "/** Infinite Scroll only.\n * Whether the last row index is know. */",
       "type": { "returnType": "boolean", "optional": true }
     },
     "info": {
@@ -16619,11 +16627,11 @@
       "type": { "returnType": "any", "optional": true }
     },
     "maxBlocksInCache": {
-      "description": "/** Partial store only.\n * Max blocks allowed in the store. */",
+      "description": "/** Infinite Scroll only.\n *  Max blocks allowed in the store. */",
       "type": { "returnType": "number", "optional": true }
     },
     "cacheBlockSize": {
-      "description": "/** Partial store only.\n * The size (number of rows) of each block. */",
+      "description": "/** Infinite Scroll only.\n * The size (number of rows) of each block. */",
       "type": { "returnType": "number", "optional": true }
     }
   },
@@ -19704,7 +19712,7 @@
       "type": { "returnType": "any[]", "optional": false }
     },
     "rowCount": {
-      "description": "/** The last row, if known, to help Infinite Scroll (i.e Partial Store) and Pagination. */",
+      "description": "/** The last row, if known, to help Infinite Scroll. */",
       "type": { "returnType": "number", "optional": true }
     },
     "storeInfo": {
@@ -22288,8 +22296,12 @@
       "type": { "returnType": "number", "optional": true }
     },
     "serverSideStoreType": {
-      "description": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "description": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
       "type": { "returnType": "ServerSideStoreType", "optional": true }
+    },
+    "serverSideInfiniteScroll": {
+      "description": "/** Whether Server-side Row Model will use Infinite Scrolling */",
+      "type": { "returnType": "boolean", "optional": true }
     },
     "cacheBlockSize": {
       "description": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
@@ -22328,7 +22340,7 @@
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideFilterOnServer": {
-      "description": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "description": "/** When enabled, the grid will always request the server to provide the filter results */",
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideSortingAlwaysResets": {
@@ -25029,8 +25041,12 @@
       "type": { "returnType": "number", "optional": true }
     },
     "serverSideStoreType": {
-      "description": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "description": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
       "type": { "returnType": "ServerSideStoreType", "optional": true }
+    },
+    "serverSideInfiniteScroll": {
+      "description": "/** Whether Server-side Row Model will use Infinite Scrolling */",
+      "type": { "returnType": "boolean", "optional": true }
     },
     "cacheBlockSize": {
       "description": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
@@ -25069,7 +25085,7 @@
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideFilterOnServer": {
-      "description": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "description": "/** When enabled, the grid will always request the server to provide the filter results */",
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideSortingAlwaysResets": {
@@ -27780,8 +27796,12 @@
       "type": { "returnType": "number", "optional": true }
     },
     "serverSideStoreType": {
-      "description": "/** Whether to use Full Store or Partial Store for storing rows. Default: `full` */",
+      "description": "/** @deprecated Whether to use Full Store or Partial Store for storing rows. Default: `full`.\nDeprecated in favour of serverSideInfiniteScroll. When true, Partial Store is used. When false,\nFull Store is used.\n */",
       "type": { "returnType": "ServerSideStoreType", "optional": true }
+    },
+    "serverSideInfiniteScroll": {
+      "description": "/** Whether Server-side Row Model will use Infinite Scrolling */",
+      "type": { "returnType": "boolean", "optional": true }
     },
     "cacheBlockSize": {
       "description": "/** How many rows for each block in the store, i.e. how many rows returned from the server at a time.\n * Default: `100` */",
@@ -27820,7 +27840,7 @@
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideFilterOnServer": {
-      "description": "/** When enabled, the grid will always request the server should provide the filter results */",
+      "description": "/** When enabled, the grid will always request the server to provide the filter results */",
       "type": { "returnType": "boolean", "optional": true }
     },
     "serverSideSortingAlwaysResets": {
