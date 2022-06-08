@@ -129,7 +129,6 @@ export class Annotation {
                     y: yStart
                 }
             );
-
         } else {
             [xStart, xEnd] = xScale.range;
             [yStart, yEnd] = range || [value, undefined];
@@ -162,12 +161,13 @@ export class Annotation {
         const points = pathData.points;
         const { path } = annotationLine;
 
-        path.clear();
+        path.clear({ trackChanges: true });
         pathMethods.forEach((method, i) => {
             const { x, y } = points[i];
             path[method](x, y);
         })
         path.closePath();
+        annotationLine.checkPathDirty();
     }
 
     private updateLineNode() {
@@ -190,11 +190,12 @@ export class Annotation {
         const points = pathData.points;
         const { path } = annotationRange;
 
-        path.clear();
+        path.clear({ trackChanges: true });
         points.forEach((point, i) => {
             const { x, y } = point;
             path[i > 0 ? 'lineTo' : 'moveTo'](x, y);
         });
         path.closePath();
+        annotationRange.checkPathDirty();
     }
 }
