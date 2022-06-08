@@ -14,7 +14,7 @@ import {
     RowNode,
     RowNodeBlock,
     ServerSideStoreParams,
-    RowNodeBlockLoader
+    RowNodeBlockLoader,
 } from "@ag-grid-community/core";
 import { StoreUtils } from "../stores/storeUtils";
 import { BlockUtils } from "./blockUtils";
@@ -218,7 +218,6 @@ export class PartialStoreBlock extends RowNodeBlock {
     }
 
     public setData(rows: any[] = [], failedLoad = false): void {
-
         this.destroyRowNodes();
 
         const storeRowCount = this.parentStore.getRowCount();
@@ -236,6 +235,29 @@ export class PartialStoreBlock extends RowNodeBlock {
         const cachedRowHeight = cachedBlockHeight ? Math.round(cachedBlockHeight / rowsToCreate) : undefined;
 
         for (let i = 0; i < rowsToCreate; i++) {
+            const getRowIdFunc = this.gridOptionsWrapper.getRowIdFunc();
+            const dataLoadedForThisRow = i < rows.length;
+
+            if (getRowIdFunc && dataLoadedForThisRow) {
+                const data = rows[i];
+                const parentKeys = this.parentRowNode.getGroupKeys();
+                const id = getRowIdFunc({
+                    data,
+                    level: this.level,
+                    parentKeys: parentKeys.length > 0 ? parentKeys : undefined,
+                });
+
+                const cachedRow = this.parentStore.retrieveNodeFromCache(id);
+                if (cachedRow) {
+                    this.blockUtils.updateDataIntoRowNode(cachedRow, data);
+                    this.parentStore.removeDuplicateNode(id);
+                    this.nodeManager.addRowNode(cachedRow);
+                    this.allNodesMap[id] = cachedRow;
+                    this.rowNodes.push(cachedRow);
+                    continue;
+                }
+            }
+
             const rowNode = this.blockUtils.createRowNode(
                 {
                     field: this.groupField, 
@@ -247,7 +269,6 @@ export class PartialStoreBlock extends RowNodeBlock {
                     rowHeight: cachedRowHeight
                 }
             );
-            const dataLoadedForThisRow = i < rows.length;
             if (dataLoadedForThisRow) {
                 const data = rows[i];
                 const defaultId = this.prefixId(this.startRow + i);
@@ -304,7 +325,10 @@ export class PartialStoreBlock extends RowNodeBlock {
 
     @PreDestroy
     private destroyRowNodes(): void {
-        this.blockUtils.destroyRowNodes(this.rowNodes);
+        this.rowNodes?.forEach(row => {
+            const isStoreCachingNode = this.parentStore.isNodeCached(row.id!);
+            this.blockUtils.destroyRowNode(row, isStoreCachingNode);
+        } );
         this.rowNodes = [];
         this.allNodesMap = {};
     }
