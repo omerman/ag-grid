@@ -3130,6 +3130,14 @@
   "ChartOptionType": { "meta": { "typeParams": ["T extends ChartType"] } },
   "SeriesOptionType": {},
   "AxisOptionType": { "meta": { "typeParams": ["T extends Axis<any, any>"] } },
+  "AnnotationPathData": {
+    "points": {
+      "type": {
+        "returnType": "{\n        readonly x: number;\n        readonly y: number;\n    }[]",
+        "optional": false
+      }
+    }
+  },
   "ChartClickEvent": {
     "event": { "type": { "returnType": "MouseEvent", "optional": false } },
     "source": { "type": { "returnType": "Chart", "optional": false } },

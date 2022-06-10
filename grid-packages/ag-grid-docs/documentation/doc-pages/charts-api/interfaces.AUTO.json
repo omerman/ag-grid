@@ -2121,6 +2121,10 @@
     "meta": { "isTypeAlias": true, "typeParams": ["T extends Axis<any, any>"] },
     "type": "T extends LogAxis ? AgLogAxisOptions : T extends NumberAxis ? AgNumberAxisOptions : T extends CategoryAxis ? AgCategoryAxisOptions : T extends GroupedCategoryAxis ? AgGroupedCategoryAxisOptions : T extends TimeAxis ? AgTimeAxisOptions : never"
   },
+  "AnnotationPathData": {
+    "meta": {},
+    "type": { "points": "{ readonly x: number; readonly y: number; }[]" }
+  },
   "ChartClickEvent": {
     "meta": {},
     "type": { "event": "MouseEvent", "source": "Chart", "type": "string" }
