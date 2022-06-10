@@ -63,7 +63,7 @@ export class ScatterSeries extends CartesianSeries {
     private sizeScale = new LinearScale();
 
     private nodeData: ScatterNodeDatum[] = [];
-    private markerSelection: Selection<Marker, Group, ScatterNodeDatum, any> = Selection.select(this.pickGroup).selectAll<Marker>();
+    private markerSelection: Selection<Marker, Group, ScatterNodeDatum, any> = Selection.select(this.seriesGroup).selectAll<Marker>();
     private highlightSelection: Selection<Marker, Group, ScatterNodeDatum, any> = Selection.select(this.highlightGroup).selectAll<Marker>();
     private labelSelection: Selection<Text, Group, PlacedLabel, any> = Selection.select(this.seriesGroup).selectAll<Text>();
 
@@ -263,6 +263,7 @@ export class ScatterSeries extends CartesianSeries {
     update(): void {
         super.update();
         this.updateSelections();
+        this.updateMarkerSelection(true);
         this.updateNodes();
     }
 
@@ -273,7 +274,7 @@ export class ScatterSeries extends CartesianSeries {
         this.nodeDataRefresh = false;
 
         this.createNodeData();
-        this.updateMarkerSelection();
+        this.updateMarkerSelection(false);
         this.updateLabelSelection();
     }
 
@@ -296,19 +297,33 @@ export class ScatterSeries extends CartesianSeries {
         this.labelSelection = updateLabels.merge(enterLabels);
     }
 
-    private updateMarkerSelection(): void {
-        const { markerSelection, highlightSelection } = this;
+    private updateMarkerSelection(highlight: boolean): void {
+        const {
+            nodeData,
+            markerSelection,
+            marker: { enabled },
+            highlightSelection,
+            chart: {
+                highlightedDatum: { datum = undefined, series = undefined } = {},
+                highlightedDatum = undefined,
+            } = {},
+        } = this;
         const MarkerShape = getMarker(this.marker.shape);
 
-        const update = (selection: typeof markerSelection) => {
-            const updateMarkers = selection.setData(this.nodeData);
+        const update = (selection: typeof markerSelection, data: ScatterNodeDatum[]) => {
+            const updateMarkers = selection.setData(data);
             updateMarkers.exit.remove();
             const enterMarkers = updateMarkers.enter.append(MarkerShape);
             return updateMarkers.merge(enterMarkers);
         };
 
-        this.markerSelection = update(markerSelection);
-        this.highlightSelection = update(highlightSelection);
+        if (highlight) {
+            const highlightData = enabled && series === this && highlightedDatum && datum ? [highlightedDatum as ScatterNodeDatum] : [];
+            this.highlightSelection = update(highlightSelection, highlightData);
+        } else {
+            const data = enabled ? nodeData : [];
+            this.markerSelection = update(markerSelection, data);
+        }
     }
 
     private updateLabelNodes() {
@@ -387,7 +402,7 @@ export class ScatterSeries extends CartesianSeries {
             node.translationX = datum.point.x;
             node.translationY = datum.point.y;
             node.zIndex = isDatumHighlighted ? Series.highlightedZIndex : index;
-            node.visible = marker.enabled && node.size > 0;
+            node.visible = node.size > 0;
         });
 
         this.markerSelection

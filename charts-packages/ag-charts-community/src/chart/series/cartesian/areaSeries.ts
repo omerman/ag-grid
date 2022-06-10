@@ -23,7 +23,7 @@ import { Text } from "../../../scene/shape/text";
 import { Label } from "../../label";
 import { sanitizeHtml } from "../../../util/sanitize";
 import { FontStyle, FontWeight } from "../../../scene/shape/text";
-import { isContinuous, isDiscrete, isNumber } from "../../../util/value";
+import { isContinuous, isNumber } from "../../../util/value";
 import { clamper, ContinuousScale } from "../../../scale/continuousScale";
 import { doOnce } from "../../../util/function";
 import { Node } from '../../../scene/node';
@@ -414,6 +414,7 @@ export class AreaSeries extends CartesianSeries {
     update(): void {
         super.update();
         this.updateSelections();
+        this.updateHighlightSelection();
         this.updateNodes();
     }
 
@@ -426,7 +427,6 @@ export class AreaSeries extends CartesianSeries {
         this.createSelectionData();
         this.updateSeriesGroups();
 
-        this.highlightMarkerSelection = this.updateMarkerSelection(this.highlightMarkerSelection, this.allMarkerSelectionData);
         this.seriesGroups.forEach(((seriesGroup, idx) => {
             const { markerSelection } = seriesGroup;
             this.updateFillSelection(idx);
@@ -434,6 +434,18 @@ export class AreaSeries extends CartesianSeries {
             seriesGroup.markerSelection = this.updateMarkerSelection(markerSelection, this.markerSelectionData[idx]);
             this.updateLabelSelection(idx);
         }))
+    }
+
+    updateHighlightSelection() {
+        const {
+            chart: {
+                highlightedDatum: { datum = undefined, series = undefined } = {},
+                highlightedDatum = undefined,
+            } = {},
+        } = this;
+
+        const highlightData = series === this && highlightedDatum && datum ? [highlightedDatum as MarkerSelectionDatum] : [];
+        this.highlightMarkerSelection = this.updateMarkerSelection(this.highlightMarkerSelection, highlightData);
     }
 
     updateNodes() {
@@ -665,11 +677,11 @@ export class AreaSeries extends CartesianSeries {
 
             const fill = new Path();
             fill.tag = AreaSeriesTag.Fill;
-            pickGroup.appendChild(fill);
+            group.appendChild(fill);
 
             const stroke = new Path();
             stroke.tag = AreaSeriesTag.Stroke;
-            pickGroup.appendChild(stroke);
+            group.appendChild(stroke);
 
             seriesGroups.push({
                 group,
@@ -710,13 +722,14 @@ export class AreaSeries extends CartesianSeries {
         const path = fill.path;
         path.clear({ trackChanges: true });
 
-        points.forEach(({ x, y }, i) => {
-            if (i > 0) {
-                path.lineTo(x, y);
+        let i = 0;
+        for (const p of points) {
+            if (i++ > 0) {
+                path.lineTo(p.x, p.y);
             } else {
-                path.moveTo(x, y);
+                path.moveTo(p.x, p.y);
             }
-        });
+        }
 
         path.closePath();
         fill.checkPathDirty();
@@ -754,16 +767,17 @@ export class AreaSeries extends CartesianSeries {
         const path = stroke.path
         path.clear({ trackChanges: true });
 
-        points.forEach(({x, y}, i) => {
-            if (yValues[i] === undefined) {
+        let i = 0;
+        for (const p of points) {
+            if (yValues[i++] === undefined) {
                 moveTo = true;
             } else if (moveTo) {
-                path.moveTo(x, y);
+                path.moveTo(p.x, p.y);
                 moveTo = false;
             } else {
-                path.lineTo(x, y);
+                path.lineTo(p.x, p.y);
             }
-        });
+        }
         stroke.checkPathDirty();
     }
 

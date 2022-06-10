@@ -684,6 +684,7 @@ export class BarSeries extends CartesianSeries {
     update(): void {
         super.update();
         this.updateSelections();
+        this.updateHighlightSelection();
         this.updateNodes();
     }
 
@@ -696,12 +697,23 @@ export class BarSeries extends CartesianSeries {
         this.createNodeData();
         this.updateSeriesGroups();
 
-        this.highlightRectSelection = this.updateRectSelection(this.highlightRectSelection, this.allNodeData);
         this.seriesGroups.forEach((groupSeries, idx) => {
             const { labelSelection, rectSelection } = groupSeries;
             groupSeries.rectSelection = this.updateRectSelection(rectSelection, this.nodeData[idx]);
             groupSeries.labelSelection = this.updateLabelSelection(labelSelection, this.nodeData[idx]);
         });
+    }
+
+    updateHighlightSelection() {
+        const {
+            chart: {
+                highlightedDatum: { datum = undefined, series = undefined } = {},
+                highlightedDatum = undefined,
+            } = {},
+        } = this;
+
+        const highlightData = series === this && highlightedDatum && datum ? [highlightedDatum as BarNodeDatum] : [];
+        this.highlightRectSelection = this.updateRectSelection(this.highlightRectSelection, highlightData);
     }
 
     private updateSeriesGroups() {
@@ -774,7 +786,7 @@ export class BarSeries extends CartesianSeries {
 
         const {
             fills, strokes, fillOpacity, strokeOpacity, shadow, formatter,
-            xKey, flipXY, yKeys,
+            xKey, flipXY,
             chart: { highlightedDatum },
             highlightStyle: {
                 fill: deprecatedFill,
